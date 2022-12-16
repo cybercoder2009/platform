@@ -1,0 +1,1 @@
+export const format = timestamp => new Date(timestamp * 1000).toLocaleString()

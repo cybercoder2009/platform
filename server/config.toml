@@ -1,0 +1,7 @@
+log = "./log/"
+address = "127.0.0.1"
+port = 8080
+images = "https://na0.reducing.ca/images"
+db = "db"
+mqtt_host = "45.79.116.50"
+mqtt_port = 1883

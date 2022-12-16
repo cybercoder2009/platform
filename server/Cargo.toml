@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "lib_server",
+    "lib_canvas",
+    "lib_vendors",
+    "lib_utilities",
+    "lib_fonts_checker",
+    "lib_test",
+]

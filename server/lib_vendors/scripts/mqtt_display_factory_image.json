@@ -1,0 +1,9 @@
+{
+    "queueId": 1004,
+    "deviceType": 1,
+    "deviceCode": "价签编号",
+    "deviceMac": "价签16字符MAC地址",
+    "deviceVersion": "4.0.0",
+    "refreshAction": 2,
+    "refreshArea": 0
+}

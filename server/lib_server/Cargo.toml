@@ -1,0 +1,25 @@
+[package]
+name = "server"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+toml = {version = "0.5.8", default-features = false}
+log = {version = "0.4", default-features = false }
+fern = {version = "0.6.1", default-features = false, features = ["date-based"]}
+lazy_static = {version = "1.4.0", default-features = false}
+chrono = {version = "0.4.19", default-features = false}
+rand = {version = "0.8.4", default-features = false}
+num_cpus = {version = "1.13.0", default-features = false}
+rocket = {version = "0.5.0-rc.1", features = ["json"], default-features = false}
+rocket_cors = {git = "https://github.com/lawliet89/rocket_cors.git"}
+lru = { version = "0.8.1" }
+rusty-leveldb = {version = "1.0.4"}
+rumqttc = {version = "0.18.0"}
+image = {version = "0.24.2"}
+serde = {version = "1.0.126", default-features = false, features = ["derive"]}
+serde_json = {version = "1.0.59", default-features = false}
+strum_macros = {version = "0.24.0", default-features = false}
+lib_canvas = {path = "../lib_canvas"}
+lib_utilities = {path = "../lib_utilities"}
+lib_vendors = {path = "../lib_vendors"}

@@ -1,0 +1,1 @@
+scp -r ./public root@45.79.116.50:~/server

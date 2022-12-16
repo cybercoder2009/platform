@@ -1,0 +1,1 @@
+```npm link ../ui-designer/node_modules/react```

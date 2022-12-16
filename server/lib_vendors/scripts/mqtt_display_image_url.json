@@ -1,0 +1,14 @@
+{
+    "queueId": 1005,
+    "deviceType": 1,
+    "deviceCode": "价签编号",
+    "deviceMac": "价签16字符MAC地址",
+    "deviceVersion": "4.0.0",
+    "refreshAction": 3,
+    "refreshArea": 1,
+    "content": [
+    {
+        "dataRef": "基站可访问的图片HTTP地址，如需HTTPS支持请联系售后处理",
+        "layerEnd": true
+    }]
+}

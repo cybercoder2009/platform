@@ -1,0 +1,10 @@
+{
+  "name": "pda",
+  "displayName": "Reducing",
+  "r_home": "home",
+  "r_login": "login",
+  "r_config": "config",
+  "r_logs": "logs",
+  "color_primary": "#3aa4fd",
+  "color_grey": "#6e6e6e"
+}

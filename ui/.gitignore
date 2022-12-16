@@ -1,0 +1,12 @@
+.DS_Store
+.github
+node_modules
+package-lock.json
+dist/app.js
+dist/app.css
+ssl/server.cert
+ssl/server.key
+website/.DS_Store
+src/.DS_Store
+src/components/.DS_Store
+src/config.js

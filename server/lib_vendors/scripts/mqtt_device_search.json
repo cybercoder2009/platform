@@ -1,0 +1,12 @@
+{
+    "queueId": 1009,
+    "action": 2,
+    "deviceType": 2,
+    "content":
+    {
+    	"enable_device_searching": true,
+        "is_esl_device_searching_triggered": true,
+        "device_searching_id": 123456,
+        "device_searching_triggered_time": 0
+    }
+}

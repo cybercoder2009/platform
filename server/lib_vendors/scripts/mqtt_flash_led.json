@@ -1,0 +1,16 @@
+{
+    "queueId": 1022,
+    "action": 2,
+    "deviceType": 1,
+    "deviceCode": "价签编号",
+    "deviceMac": "价签16字符MAC地址",
+    "content":
+    {
+        "led_info":
+        {
+            "color": 4294901760,
+            "period": 8000,
+            "count": 10
+        }
+    }
+}

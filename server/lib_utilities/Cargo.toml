@@ -1,0 +1,14 @@
+[package]
+name = "lib_utilities"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+log = { version = "0.4" }
+md5 = { version = "0.7.0" }
+sha3 = { version = "0.10.1" }
+rand = { version = "0.8.4" }
+chrono = { version = "0.4.19" }
+png = { version = "0.17.5" }
+hex = { version = "0.4.3" }
+regex = {version = "1.5.4" }

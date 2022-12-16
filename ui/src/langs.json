@@ -1,0 +1,75 @@
+{
+	"auth": {"en": "Auth", "fr": "Auth"},
+	"admin": {"en": "Admin", "fr": "Admin"},
+	"actions": {"en": "Actions", "fr": "Actions"},
+	"associates": {"en": "Associates", "fr": "Associées"},
+
+	"bases": {"en": "Bases", "fr": "Socles"},
+	"base_created": {"en": "Base Created", "fr": "Socle Établie"},
+	"base_updated": {"en": "Base Updated", "fr": "Socle Actualisé"},
+	"base_deleted": {"en": "Base Deleted", "fr": "Socle Supprimé"},
+
+	"create": {"en": "Create", "fr": "Créer"},
+	"change_password": {"en": "Change Password", "fr": "changer le mot de passe"},
+
+	"delete": {"en": "Delete", "fr": "Effacer"},
+	"designer": {"en": "Designer", "fr": "Designer"},
+
+	"edit": {"en": "Edit", "fr": "Editer"},
+	"email": {"en": "Email", "fr": "E-mail"},
+	"extra": {"en": "Extra", "fr": "En plus"},
+
+	"firmware": {"en": "Firmware", "fr": "Micrologiciel"},
+	
+	"group": {"en": "Group", "fr": "Groupe"},
+	"groups": {"en": "Groups", "fr": "Groupes"},
+	"group_id": {"en": "Group ID", "fr": "Groupe Identifiant"},
+	"group_name": {"en": "Group Name", "fr": "Groupe Nom"},
+
+	"hash": {"en": "Hash", "fr": "Hacher"},
+	"home": {"en": "Home", "fr": "Domicile"},
+	"height": {"en": "Height", "fr": "La taille"},
+
+	"id": {"en": "ID", "fr": "Identifiant"},
+	"item": {"en": "Item", "fr": "Elément"},
+	"items": {"en": "Items", "fr": "Eléments"},
+	"initiator": {"en": "Initiator", "fr": "Initiateur"},
+
+	"keyword": {"en": "Keyword", "fr": "Mot-clé"},
+
+	"logs": {"en": "Logs", "fr": "Journaux"},
+	"lang": {"en": "EN", "fr": "FR"},
+	"level": {"en": "Level", "fr": "Niveau"},
+	"limit": {"en": "Limit", "fr": "Limite"},
+	"labels": {"en": "Labels", "fr": "Etiquettes"},
+
+	"mac": {"en": "MAC", "fr": "MAC"},
+	"model": {"en": "Model", "fr": "Maquette"},
+
+	"name": {"en": "Name", "fr": "Nom"},
+	"new_password": {"en": "New Password", "fr": "nouveau mot de passe"},
+
+	"order": {"en": "Order", "fr": "Ordre"},
+
+	"power": {"en": "Power", "fr": "Puissance"},
+	"password": {"en": "Password", "fr": "Le mot de passe"},
+	"password_updated": {"en": "Password Updated", "fr": "Le mot de passe Mettre à jour"},
+
+	"sort": {"en": "Sort", "fr": "Trier"},
+	"save": {"en": "Save", "fr": "Economiser"},
+	"search": {"en": "Search", "fr": "Chercher"},
+	"settings": {"en": "Settings", "fr": "Settings"},
+
+	"time": {"en": "Time", "fr": "Temps"},
+	"thumbnail": {"en": "Thumbnail", "fr": "Vignette"},
+	"template": {"en": "Template", "fr": "Modèle"},
+	"templates": {"en": "Templates", "fr": "Modèles"},
+	"temperature": {"en": "Temperature", "fr": "Température"},
+
+	"users": {"en": "Users", "fr": "Utilisatrices"},
+	"update": {"en": "Update", "fr": "Mettre à jour"},
+
+	"vendor": {"en": "Vendor", "fr": "Vendeuse"},
+
+	"width": {"en": "Width", "fr": "Largeur"}
+}

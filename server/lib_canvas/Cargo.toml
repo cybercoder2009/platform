@@ -1,0 +1,16 @@
+[package]
+name = "lib_canvas"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+log = { version = "0.4" }
+regex = { version = "1.5.4" }
+base64 = { version = "0.13.0" }
+lazy_static = { version = "1.4.0" }
+serde = { version = "1.0.126", features = ["derive"] }
+serde_bytes = { version = "0.11" }
+#barcoders = { git = "https://github.com/danavation/barcoders", branch = "msi", features = ["image"] }
+barcoders = { version = "1.0.2", features = ["image"] }
+qrcodegen = { version = "1.7.0" }
+skia-safe = { version = "0.53.0" }
