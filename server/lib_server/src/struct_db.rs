@@ -1,5 +1,5 @@
 use std::sync::Mutex;
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, BTreeMap};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use rusty_leveldb::{DB as LevelDB, Options, in_memory};
@@ -145,6 +145,7 @@ impl DB {
             let mut users: BTreeSet<String> = BTreeSet::new();
             users.insert(ID_ADMIN.to_string());
             users.insert(ID_USER.to_string());
+            users.insert(ID_USER0.to_string());
             self.write::<BTreeSet<String>>(KEY_USERS, &users);
 
             // update g-all
@@ -153,11 +154,10 @@ impl DB {
             groups.insert(ID_GROUP_USER.to_string());
             self.write::<BTreeSet<String>>(KEY_GROUPS, &groups);
 
-            // update u-$id_user
-            let _key_admin: String = key_user(ID_ADMIN);
+            // update u-$id_user - admin
             let mut id_groups: BTreeSet<String> = BTreeSet::new();
             id_groups.insert(ID_GROUP_ADMIN.to_string());
-            self.write::<User>(&_key_admin,
+            self.write::<User>(&key_user(ID_ADMIN),
                 &User{
                     password: sha3_256(PW_ADMIN),
                     role: Role::Admin,
@@ -166,11 +166,10 @@ impl DB {
                 },
             );
 
-            // update u-$id_user
-            let _key_user: String = key_user(ID_USER);
+            // update u-$id_user - user
             let mut id_groups: BTreeSet<String> = BTreeSet::new();
             id_groups.insert(ID_GROUP_USER.to_string());
-            self.write::<User>(&_key_user,
+            self.write::<User>(&key_user(ID_USER),
                 &User{
                     password: sha3_256(PW_USER),
                     role: Role::User,
@@ -178,8 +177,18 @@ impl DB {
                     id_groups,
                 }
             );
+
+            // update u-$id_user - user0
+            self.write::<User>(&key_user(ID_USER0),
+                &User{
+                    password: sha3_256(PW_USER0),
+                    role: Role::User,
+                    token: TOKEN_USER0.to_string(),
+                    id_groups: BTreeSet::new(),
+                }
+            );
      
-            // update g-$id_group
+            // update g-$id_group - admin
             let _key_group: String = key_group(ID_GROUP_ADMIN);
             self.write::<Group>(&_key_group,
                 &Group {
@@ -188,22 +197,24 @@ impl DB {
                     id_bases: BTreeSet::new(),
                     id_templates: BTreeSet::new(),
                     id_associates: BTreeSet::new(),
-                    id_items: BTreeSet::new(),
-                    id_labels: BTreeSet::new(),
+                    id_items: BTreeMap::new(),
+                    id_labels: BTreeMap::new(),
                 }
             );
 
-            // update g-$id_group
+            // update g-$id_group - user
             let _key_group: String = key_group(ID_GROUP_USER);
+            let mut id_associates: BTreeSet<String> = BTreeSet::new();
+            id_associates.insert(ID_USER0.to_string());
             self.write::<Group>(&_key_group,
                 &Group {
                     id: ID_GROUP_USER.to_string(),
                     name: "My First Group".to_string(),
                     id_bases: BTreeSet::new(),
                     id_templates: BTreeSet::new(),
-                    id_associates: BTreeSet::new(),
-                    id_items: BTreeSet::new(),
-                    id_labels: BTreeSet::new(),
+                    id_associates,
+                    id_items: BTreeMap::new(),
+                    id_labels: BTreeMap::new(),
                 }
             );
         }

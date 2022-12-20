@@ -1,1 +1,1 @@
-cargo build && scp -r ./fonts/* root@45.79.116.50:/usr/share/fonts/truetype
+scp -r ../fonts/* root@45.79.116.50:/usr/share/fonts/truetype

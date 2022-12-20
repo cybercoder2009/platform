@@ -2,6 +2,7 @@
 	"auth": {"en": "Auth", "fr": "Auth"},
 	"admin": {"en": "Admin", "fr": "Admin"},
 	"actions": {"en": "Actions", "fr": "Actions"},
+	"associate": {"en": "Associate", "fr": "Associée"},
 	"associates": {"en": "Associates", "fr": "Associées"},
 
 	"bases": {"en": "Bases", "fr": "Socles"},

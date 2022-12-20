@@ -6,7 +6,7 @@ const send = (
 	str_token,
 	obj_json,
 ) => new Promise((res, rej)=>{
-	console.log(str_method, encodeURI(str_url))
+	console.debug(`services.send str_method=${str_method} str_url=${encodeURI(str_url)}`)
 	let xhr = new XMLHttpRequest()
 	xhr.onload = () => {
 		if (xhr.status == 403 || xhr.status == 404) {
@@ -31,6 +31,7 @@ const parse = str => str.trim() === '' ? ' ' : str
 
 export const service_auth = {
 	post: (str_id, str_password) => send('POST', `${package_info.api}/auth`, '', {id: str_id, password: str_password})
+	
 }
 
 export const service_logs = {
@@ -85,7 +86,7 @@ export const service_users = {
 
 export const service_associates = {
 	post: (str_token, str_id_group, json_users) => send('POST', `${package_info.api}/groups/${str_id_group}/associates`, str_token, json_users),
-	get: (str_token, str_id_group, str_keyword, uint_skip, uint_limit) => send('GET', `${package_info.api}/groups/${parse(str_id_group)}/associates/q/${parse(str_keyword)}/s/${uint_skip}/l/${uint_limit}/`, str_token, {}),
+	get: (str_token, str_id_group, str_keyword, uint_skip, uint_limit) => send('GET', `${package_info.api}/groups/${parse(str_id_group)}/associates/q/${parse(str_keyword)}/s/${uint_skip}/l/${uint_limit}`, str_token, {}),
 	del: (str_token, str_id_group, str_id_user) => send('DELETE', `${package_info.api}/groups/${str_id_group}/associates/${str_id_user}`, str_token, {}),
 }
 

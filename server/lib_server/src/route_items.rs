@@ -8,7 +8,7 @@ use serde_json::Value;
 use rumqttc::AsyncClient;
 use lib_canvas::template::Template;
 
-use crate::constants::{Code, MAX_LIMIT, MAX_POST, error};
+use crate::constants::*;
 use crate::service_data::{populate, render_label_image};
 use crate::struct_auth::Auth;
 use crate::struct_user::User;
@@ -20,17 +20,20 @@ use crate::struct_label::Label;
 
 #[post("/<id_group>/items", format = "application/json", data = "<items>")]
 pub async fn post<'r>(
-    server: &'r State<Server>, _auth: Auth,
+    server: &'r State<Server>, auth: Auth,
     id_group: &'r str, items: Json<Vec<Value>>,
 ) -> Json<Response<String>> {
     
     // filter
-    if items.len() > MAX_POST { return error("post-max"); } 
+    if items.len() > MAX_POST { return error(ERR_MAX_LIMIT); } 
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
-    
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group= opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
+        return error(ERR_ACCESS_DENIED); }
+
     let mut data: Vec<String> = vec![];
     let mut keys_items: Vec<String> = vec![];
     let mut keys_items_labels: Vec<String> = vec![];
@@ -45,7 +48,7 @@ pub async fn post<'r>(
         let id_item: String = item["id"].as_str().unwrap().to_string();
         if id_item.trim().is_empty() { continue; }
 
-        group.id_items.insert(id_item.clone());
+        group.id_items.insert(id_item.clone(), item["keyword"].to_string().trim().to_lowercase());
         keys_items.push(key_item(id_group, &id_item));
         keys_items_labels.push(key_item_labels(id_group, &id_item));
         values_items_labels.push(BTreeSet::new());
@@ -60,8 +63,6 @@ pub async fn post<'r>(
 
         // populate & dispatch
         spawn(async move {
-
-            
 
             let opt_id_labels: Option<BTreeSet<String>> = db_0.read::<BTreeSet<String>>(&_key_item_labels);
             if opt_id_labels.is_none() { return (); }
@@ -135,17 +136,24 @@ pub async fn get<'r>(
 ) -> Json<Response<Value>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error("access-denied"); }
     let opt_group: Option<Group> = server.db.read::<Group>(&key_group(id_group));
-    if opt_group.is_none() { return error("group-not-found"); }
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
+    let mut group: Group = opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
+        return error(ERR_ACCESS_DENIED); }
 
     limit = std::cmp::min(limit, MAX_LIMIT);
-    info!("items get _id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit);
-    let group: Group = opt_group.unwrap();
+    info!("items get id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit);
+    let keyword_0: String = keyword.trim().to_lowercase();
+    
+    group.id_items.retain(
+        |id, _keyword|
+        id.contains(keyword) || _keyword.contains(&keyword_0)
+    );
     let total: usize = group.id_items.len();
-    let keys: Vec<String> = group.id_items
-        .into_iter().collect::<Vec<String>>()[skip .. min(skip + limit, total)]
+    let keys: Vec<String> = group.id_items.keys()
+        .cloned().collect::<Vec<String>>()[skip .. min(skip + limit, total)]
         .iter().map(|id|{key_item(id_group, id)}).collect();
     let items: Vec<Value> = server.db.read_batch::<Value>(&keys);
 
@@ -163,13 +171,14 @@ pub async fn delete<'r>(
 ) -> Json<Response<&'r str>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error("access-denied"); }
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group = opt_group.unwrap();
-    if !group.id_items.contains(id_item) { return error("item-not-found"); }
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
+        return error(ERR_ACCESS_DENIED); }
+    if !group.id_items.contains_key(id_item) { return error("item-not-found"); }
 
     // update g-$id_group
     group.id_items.remove(id_item);

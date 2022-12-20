@@ -21,8 +21,8 @@ const Home = ({
         labels: 0,
         templates: 0,
     })
-    const [events, set_events] = useState([])
-    const [logs, set_logs] = useState([])
+    // const [events, set_events] = useState([])
+    // const [logs, set_logs] = useState([])
     
     useEffect(_=>{
         if(!load && auth && auth.token && auth.token !== ''){
@@ -55,14 +55,16 @@ const Home = ({
     return (
         <>
             <Row gutter={8}>
-                <Col xs={12} sm={8} md={4} lg={4} xl={4}><Card title={langs['groups'][lang]} size="small" style={{textAlign: 'center'}}>{summary.groups}</Card></Col>
+                <Col xs={24} sm={8} md={8} lg={8} xl={8}><Card title={langs['groups'][lang]} size="small" style={{textAlign: 'center'}}>{summary.groups}</Card></Col>
                 {/* <Col xs={12} sm={8} md={4} lg={4} xl={4}><Card title={langs['bases'][lang]} size="small" style={{textAlign: 'center'}}>{summary.sum_bases}</Card></Col> */}
-                <Col xs={12} sm={8} md={4} lg={4} xl={4}><Card title={langs['templates'][lang]} size="small" style={{textAlign: 'center'}}>{summary.templates}</Card></Col>
-                <Col xs={12} sm={8} md={4} lg={4} xl={4}><Card title={langs['associates'][lang]} size="small" style={{textAlign: 'center'}}>{summary.associates}</Card></Col>
-                <Col xs={12} sm={8} md={4} lg={4} xl={4}><Card title={langs['items'][lang]} size="small" style={{textAlign: 'center'}}>{summary.items}</Card></Col>
-                <Col xs={12} sm={8} md={4} lg={4} xl={4}><Card title={langs['labels'][lang]} size="small" style={{textAlign: 'center'}}>{summary.labels}</Card></Col>
+                <Col xs={24} sm={8} md={8} lg={8} xl={8}><Card title={langs['templates'][lang]} size="small" style={{textAlign: 'center'}}>{summary.templates}</Card></Col>
+                <Col xs={24} sm={8} md={8} lg={8} xl={8}><Card title={langs['associates'][lang]} size="small" style={{textAlign: 'center'}}>{summary.associates}</Card></Col>
             </Row>
             <Row gutter={8}>
+                <Col xs={24} sm={12} md={12} lg={12} xl={12}><Card title={langs['items'][lang]} size="small" style={{textAlign: 'center'}}>{summary.items}</Card></Col>
+                <Col xs={24} sm={12} md={12} lg={12} xl={12}><Card title={langs['labels'][lang]} size="small" style={{textAlign: 'center'}}>{summary.labels}</Card></Col>
+            </Row>
+            {/*<Row gutter={8}>
                 <Col xs={24} sm={24} md={24} lg={16} xl={16}>
                     <Card title="Events(last 5 days)" size="small">
                         <Bar data={events}
@@ -88,7 +90,7 @@ const Home = ({
                         />
                     </Card>
                 </Col>
-            </Row>
+            </Row>*/}
         </>
     )
 }

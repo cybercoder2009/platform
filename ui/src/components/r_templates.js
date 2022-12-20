@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import {connect} from 'react-redux'
-import {Drawer, Input, Button, Table, Popconfirm, Divider, message} from 'antd'
+import {Space, Drawer, Input, Button, Table, Popconfirm, Divider, message} from 'antd'
 
 import {Designer, TEMPLATE} from 'react-designer'
 import Query from './w_query.js'
@@ -71,7 +71,7 @@ const Tempaltes = ({
                     set_record({...TEMPLATE,...{id_group: group.id}})
                     set_design(false)
                 }}
-                visible={design}
+                open={design}
                 getContainer={false}>
                 <Designer
                     template={record}
@@ -88,7 +88,7 @@ const Tempaltes = ({
                 />
             </Drawer>
             <>
-                <Input.Group>
+                <Space>
                     <Group />
                     {
                         group.id !== ""
@@ -99,10 +99,10 @@ const Tempaltes = ({
                                 ...{width: SIZES[SIZE].width, height: SIZES[SIZE].height}
                             })
                             set_design(true)
-                        }}>{langs['create'][lang]}</Button>
-                        : <Button disabled>{langs['create'][lang]}</Button>
+                        }}>+</Button>
+                        : <Button disabled>+</Button>
                     }
-                </Input.Group>
+                </Space>
                 <Divider />
                 <Query limits={[20, 40]} total={total} searchable={group.id !== ''}
                     langs={langs} lang={lang} placeholder_search="Template Name"

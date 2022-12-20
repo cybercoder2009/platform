@@ -3,7 +3,8 @@
 - setup ANDROID_HOME
 - use android studio setup target physical device
   - check usb cable, adb
-- ```npx react-native init platform-pda```
+- ```npx react-native init mobile```
+- ```echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p```
 
 # Dev
 - ```npm start``` // start metro in one terminal

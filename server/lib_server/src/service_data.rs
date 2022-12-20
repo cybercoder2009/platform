@@ -48,7 +48,7 @@ pub fn render_label_image (
 ) -> Message {
 
     let image_name: String = format!("{}.jpg", &label.id);
-    let image_path: String = format!("./public/images/{}.jpg", &image_name);
+    let image_path: String = format!("./public/images/{}", &image_name);
     let image_url: String = format!("{}/{}", images, &image_name);
     info!("item={} label={} image_path={} image_url={}",
         label.id_item, label.id, &image_path, &image_url);

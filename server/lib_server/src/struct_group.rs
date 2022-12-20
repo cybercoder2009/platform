@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, BTreeMap};
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -8,8 +8,8 @@ pub struct Group {
     pub id_bases: BTreeSet<String>,
     pub id_templates: BTreeSet<String>,
     pub id_associates: BTreeSet<String>,
-    pub id_items: BTreeSet<String>,
-    pub id_labels: BTreeSet<String>,
+    pub id_items: BTreeMap<String, String>,  // $id_item ------> $keyword(lowercase)
+    pub id_labels: BTreeMap<String, String>, // $id_item ------> $keyword(lowercase)
 }
 
 #[derive(Deserialize)]

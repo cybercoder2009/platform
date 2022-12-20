@@ -13,7 +13,8 @@ export const auth = (state = {
 export const CONFIG = 'CONFIG'
 export const action_config = (config) => {return {type: CONFIG, config}}
 export const config = (state = {
-    endpoint: 'https://na0.reducing.ca/api'
+    endpoint: 'https://na0.reducing.ca/api',
+    group: 't6zNqWHbjg2C21uY',
 }, action) => {
     switch(action.type){
         case CONFIG: return action.config

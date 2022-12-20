@@ -6,7 +6,7 @@ use lib_utilities::hash::sha3_256;
 use lib_utilities::random::string;
 use lib_utilities::validate::email;
 
-use crate::constants::{Code, Role, MAX_LIMIT, error};
+use crate::constants::*;
 use crate::struct_db::{KEY_USERS, key_user};
 use crate::struct_auth::Auth;
 use crate::struct_response::Response;
@@ -20,7 +20,7 @@ pub async fn post<'r>(
 ) -> Json<Response<String>> {
 
     // filters
-    if auth.role != Role::Admin { return error("access-denied"); }
+    if auth.role != Role::Admin { return error(ERR_ACCESS_DENIED); }
     if !email(&user.id) { return error("invalid-user-id"); }
     let _key_user: String = key_user(&user.id);
     if server.db.read::<User>(&_key_user).is_some() { return error("user-exists"); }
@@ -52,7 +52,7 @@ pub async fn patch_password<'r>(
 ) -> Json<Response<&'r str>> {
 
     // filters
-    if auth.role != Role::Admin && auth.id != id { return error("access-denied"); }
+    if auth.role != Role::Admin && auth.id != id { return error(ERR_ACCESS_DENIED); }
     let _key_user: String = key_user(id);
     let opt_user: Option<User> = server.db.read::<User>(&_key_user);
     if opt_user.is_none() { return error("user-not-found"); }
@@ -75,7 +75,7 @@ pub async fn patch_role<'r>(
 ) -> Json<Response<&'r str>> {
 
     // filters
-    if auth.role != Role::Admin { return error("access-denied"); }
+    if auth.role != Role::Admin { return error(ERR_ACCESS_DENIED); }
     let _key_user: String = key_user(id);
     let opt_user: Option<User> = server.db.read::<User>(&_key_user);
     if opt_user.is_none() { return error("user-not-found"); }
@@ -98,7 +98,7 @@ pub async fn get<'r>(
 ) -> Json<Response<String>> {
     
     // fitlers
-    if auth.role != Role::Admin { return Json(Response{code: Code::Error("access-denied"), total: None, data: None}); }
+    if auth.role != Role::Admin { return error(ERR_ACCESS_DENIED); }
     let id_users: BTreeSet<String> = server.db.read::<BTreeSet<String>>(KEY_USERS).unwrap();
     let total: usize = id_users.len();
     if skip > total { return Json(Response {code: Code::Success(()), total: Some(total), data: Some(vec![])}); }
@@ -122,7 +122,7 @@ pub async fn delete<'r>(
 ) -> Json<Response<&'r str>> {
     
     // filters
-    if auth.role != Role::Admin { return error("access-denied"); }
+    if auth.role != Role::Admin { return error(ERR_ACCESS_DENIED); }
 
     // update u-{}
     let _key_user: String = key_user(id);

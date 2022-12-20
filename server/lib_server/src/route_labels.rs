@@ -8,10 +8,10 @@ use lib_canvas::template::Template;
 use lib_utilities::random::u16;
 use lib_vendors::yala::Message;
 
-use crate::constants::{Code, MAX_LIMIT, MAX_POST, error};
+use crate::constants::*;
 use crate::struct_db::*;
 use crate::struct_auth::Auth;
-use crate::struct_label::{Label, LabelPatch};
+use crate::struct_label::Label;
 use crate::struct_response::Response;
 use crate::struct_server::Server;
 use crate::struct_user::User;
@@ -20,20 +20,22 @@ use crate::service_data::{populate, render_label_image};
 
 #[post("/<id_group>/labels", format = "application/json", data = "<labels>")]
 pub async fn post<'r>(
-    server: &'r State<Server>, _auth: Auth,
+    server: &'r State<Server>, auth: Auth,
     id_group: &'r str, labels: Json<Vec<Label>>,
 ) -> Json<Response<String>> {
 
     // filter
-    if labels.len() > MAX_POST { return error("post-max"); } 
+    if labels.len() > MAX_POST { return error(ERR_MAX_LIMIT); } 
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
-    
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group= opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
+        return error(ERR_ACCESS_DENIED); }
+        
     let mut data: Vec<String> = vec![];
     let mut ks: Vec<String> = vec![];
-    // let id_bases: std::collections::BTreeSet<String> = group.id_bases.clone();
     for label in labels.iter() {
 
         // filter
@@ -41,7 +43,7 @@ pub async fn post<'r>(
         if id_label.trim().is_empty() { continue; }
 
         ks.push(key_label(id_group, &id_label));
-        group.id_labels.insert(id_label.clone());
+        group.id_labels.insert(id_label.clone(), id_label.clone().trim().to_lowercase());
         data.push(label.id.clone());
 
         // update g-$id_group-i-$id_item-labels
@@ -61,7 +63,6 @@ pub async fn post<'r>(
         }
 
         /* unbind */ if label.id_item == "" {
-
             let message: Message = Message::new(
                 u16(),
                 &label.id,
@@ -125,57 +126,6 @@ pub async fn post<'r>(
     })
 }
 
-#[post("/<id_group>/labels/<id_label>", format = "application/json", data = "<label>")]
-pub async fn patch<'r>(
-    server: &'r State<Server>, _auth: Auth,
-    id_group: &'r str, id_label: &'r str, label: Json<LabelPatch>,
-) -> Json<Response<()>> {
-
-    // filter
-    let _key_group: String = key_group(id_group);
-    let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
-    let _key_label: String = key_label(id_group, id_label);
-    let opt_label: Option<Label> = server.db.read(&_key_label);
-    if opt_label.is_none() { return error("label-not-found"); }
-
-    let mut _label: Label = opt_label.unwrap();
-
-    // update g-$id_group-i-$id_item-labels
-    if _label.id_item != label.id_item {
-        if _label.id_item != "" {
-            let _key_item_labels: String = key_item_labels(id_group, &_label.id_item);
-            let mut labels: BTreeSet<String> = server.db.read::<BTreeSet<String>>(&_key_item_labels).unwrap();
-            labels.remove(id_label);
-            server.db.write::<BTreeSet<String>>(&_key_item_labels, &labels);
-        }
-        if label.id_item != "" {
-            let _key_item_labels: String = key_item_labels(id_group, &_label.id_item);
-            match server.db.read::<BTreeSet<String>>(&_key_item_labels){
-                Some(mut labels) => {
-                    labels.insert(id_label.to_string());
-                    server.db.write::<BTreeSet<String>>(&_key_item_labels, &labels);
-                },
-                None => {
-                    let mut labels: BTreeSet<String> = BTreeSet::new();
-                    labels.insert(id_label.to_string());
-                    server.db.write::<BTreeSet<String>>(&_key_item_labels, &labels);
-                },
-            }
-        }
-    }
-
-    // update g-$id_group-$id_label
-    _label.id_item = label.0.id_item;
-    server.db.write::<Label>(&_key_label, &_label);
-
-    Json(Response {
-        code: Code::Success(()),
-        total: None,
-        data: None,
-    })
-}
-
 #[get("/<id_group>/labels/q/<keyword>/s/<skip>/l/<limit>")]
 pub async fn get<'r>(
     server: &'r State<Server>, auth: Auth,
@@ -183,17 +133,20 @@ pub async fn get<'r>(
 ) -> Json<Response<Value>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error("access-denied"); }
     let opt_group: Option<Group> = server.db.read::<Group>(&key_group(id_group));
-    if opt_group.is_none() { return error("group-not-found"); }
-
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
+    let mut group: Group = opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
+        return error(ERR_ACCESS_DENIED); }
+    
     limit = std::cmp::min(limit, MAX_LIMIT);
-    info!("labels get _id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit);
-    let group: Group = opt_group.unwrap();
+    info!("labels get _id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit); 
+    let keyword_0: String = keyword.trim().to_lowercase();
+    group.id_labels.retain(|_, _keyword|_keyword.contains(&keyword_0));
     let total: usize = group.id_labels.len();
-    let keys: Vec<String> = group.id_labels
-        .into_iter().collect::<Vec<String>>()[skip .. min(skip + limit, total)]
+    let keys: Vec<String> = group.id_labels.keys()
+        .cloned().collect::<Vec<String>>()[skip .. min(skip + limit, total)]
         .iter().map(|id|{key_label(id_group, id)}).collect();
     let labels: Vec<Value> = server.db.read_batch::<Value>(&keys);
 
@@ -211,13 +164,14 @@ pub async fn delete<'r>(
 ) -> Json<Response<&'r str>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error("access-denied"); }
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group = opt_group.unwrap();
-    if !group.id_labels.contains(id_label) { return error("label-not-found"); }
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
+        return error(ERR_ACCESS_DENIED); }
+    if !group.id_labels.contains_key(id_label) { return error("label-not-found"); }
 
     // update g-$id_group
     group.id_labels.remove(id_label);
@@ -254,10 +208,10 @@ mod route_labels {
 
     use crate::constants::Code;
     use crate::route_groups::post as group_post;
-    use crate::route_labels::{delete, get, post, patch};
+    use crate::route_labels::{delete, get, post};
     use crate::struct_auth::Auth;
     use crate::struct_group::GroupPost;
-    use crate::struct_label::{Label, LabelPatch};
+    use crate::struct_label::Label;
     use crate::struct_server::Server;
 
     #[async_test]
@@ -319,30 +273,6 @@ mod route_labels {
         println!("[route_labels.get] {:?}\r\n", res);
         assert_eq!(Code::Success(()), res.code);
         assert_eq!(1, res.total.unwrap());
-
-        // labels patch
-        let id_item: String = random::string(10);
-        let res = patch(
-            State::from(&server), Auth::_mock_user(),
-            &id_group,
-            &id_label,
-            Json(LabelPatch{id_item: id_item.clone()}),
-        ).await.into_inner();
-        println!("[route_labels.patch] {:?}\r\n", res);
-        assert_eq!(Code::Success(()), res.code);
-
-        // labels get
-        let res = get(
-            State::from(&server), Auth::_mock_user(),
-            &id_group,
-            "",
-            0,
-            1,
-        ).await.into_inner();
-        println!("[route_labels.get] {:?}\r\n", res);
-        assert_eq!(Code::Success(()), res.code);
-        let data: Label = serde_json::from_value::<Label>(res.data.unwrap()[0].to_owned()).unwrap();
-        assert_eq!(data.id_item, id_item);
 
         // labels delete
         let res = delete(

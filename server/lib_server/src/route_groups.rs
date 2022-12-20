@@ -1,11 +1,11 @@
 
 use std::cmp::min;
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, BTreeMap};
 use rocket::serde::json::Json;
 use rocket::State;
 use lib_utilities::random::string;
 
-use crate::constants::{Code, Role, MAX_LIMIT, error};
+use crate::constants::{Code, Role, MAX_LIMIT, error, ERR_GROUP_NOT_FOUND};
 use crate::struct_db::*;
 use crate::struct_auth::Auth;
 use crate::struct_user::User;
@@ -36,8 +36,8 @@ pub async fn post<'r>(
             id_bases: BTreeSet::new(),
             id_templates: BTreeSet::new(),
             id_associates: BTreeSet::new(),
-            id_items: BTreeSet::new(),
-            id_labels: BTreeSet::new(),
+            id_items: BTreeMap::new(),
+            id_labels: BTreeMap::new(),
         }
     );
 
@@ -136,7 +136,7 @@ pub async fn delete<'r>(
     // filters
     let _key_group: String = key_group(id);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
 
     // update u-$id_user
     let _key_user: String = key_user(&auth.id);

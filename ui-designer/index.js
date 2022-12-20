@@ -198,7 +198,6 @@ const Designer = (props) => {
 			<div id="designer-select">
 				{
 					props.template.elements.map((e, k) => <span key={k} className="ant-tag ant-tag-blue" onClick={_=>{
-						console.log(e)
 						set_select(k)
 					}}>{k + 1}. {e.kind}</span>)
 				}

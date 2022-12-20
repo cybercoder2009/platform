@@ -30,7 +30,7 @@ use std::time::Duration;
 use std::convert::From;
 use std::fs::create_dir_all;
 use std::net::IpAddr;
-use rumqttc::{MqttOptions, AsyncClient, QoS, EventLoop, Event};
+use rumqttc::{MqttOptions, AsyncClient, QoS, EventLoop};
 use rocket::config::{Config as ConfigRocket, LogLevel};
 use rocket::fs::FileServer;
 use rocket::http::Method;
@@ -81,15 +81,16 @@ async fn main() {
     let (mqtt, mut _eventloop): (AsyncClient, EventLoop) = AsyncClient::new(mqttoptions, 10);
     mqtt.subscribe("test/refresh/queue", QoS::AtMostOnce).await.unwrap();
     rocket::tokio::spawn(async move {
-        while let Ok(notification) = _eventloop.poll().await {
-            match notification {
-                Event::Incoming(e) => {
-                    info!("<= mqtt {:?}", e);
-                },
-                Event::Outgoing(e) => {
-                    info!("=> mqtt {:?}", e);
-                },
-            }
+        while let Ok(_notification) = _eventloop.poll().await {
+            // TODO
+            // match notification {
+            //     Event::Incoming(e) => {
+            //         info!("<= mqtt {:?}", e);
+            //     },
+            //     Event::Outgoing(e) => {
+            //         info!("=> mqtt {:?}", e);
+            //     },
+            // }
         }
     });
 
@@ -138,16 +139,16 @@ async fn main() {
                 route_items::post, route_items::get, route_items::delete,
 
                 // labels
-                route_labels::post, route_labels::patch, route_labels::get, route_labels::delete,
+                route_labels::post, route_labels::get, route_labels::delete,
 
                 // templates
                 route_templates::post, route_templates::get, route_templates::delete,
 
-                // bases
-                // route_bases::post, route_bases::get, route_bases::delete,
-
                 // associates
                 route_associates::post, route_associates::get, route_associates::delete,
+
+                // bases
+                // route_bases::post, route_bases::get, route_bases::delete,
             ],
         )
         .mount(

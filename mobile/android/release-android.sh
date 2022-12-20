@@ -1,1 +1,1 @@
-./gradlew bundleRelease && ./gradlew assembleRelease && cp ./app/build/outputs/apk/release/app-release.apk ../../platform-server/public/app-release.apk && cp ./app/build/outputs/apk/release/app-release.apk ../../website-reducing/public/app-release.apk
+./gradlew bundleRelease && ./gradlew assembleRelease && cp ./app/build/outputs/apk/release/app-release.apk ../../server/public/app-release.apk && cp ./app/build/outputs/apk/release/app-release.apk ../../../website-reducing/public/app-release.apk

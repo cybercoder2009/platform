@@ -13,7 +13,7 @@ const Login = ({
 }) => {
 
     const [loaded, set_loaded] = useState(false)
-    const [_id, set_id] = useState('')
+    const [id, set_id] = useState('')
     const [password, set_password] = useState('')
 
     useEffect(_=>{
@@ -40,19 +40,18 @@ const Login = ({
                 marginTop: 10,
                 color: '#000',
             }}>{version}</Text>
-            <TextInput value={_id} placeholder="Email" autoCorrect={false} autoCapitalize="none"
+            <TextInput value={id} placeholder="Email" autoCorrect={false} autoCapitalize="none"
                 style={{marginTop: 30}}
                 onChangeText={e=>set_id(e.trim())} />
             <TextInput value={password} placeholder="Password" secureTextEntry={true} autoCorrect={false}  autoCapitalize="none"
                 onChangeText={e=>set_password(e.trim())} />
             <Button title="Login" type="warning" style={{}}
-                onPress={_=>login_post(config.endpoint, _id, password).then(json=>{
-                        if(json && json.code === 'Success')
-                            kv_set('auth', {...auth, ...{_id, token: json.data[0].token}}).then(_=>navigation.navigate(r_home))
-                        else console.error(json)
-                    }, err=>console.error(err))
-                }
-            />
+                onPress={_=>login_post(config.endpoint, id, password).then(
+                    json=> kv_set('auth', {...auth, ...{id, token: json.data[0].token}})
+                        .then(_=>navigation.navigate(r_home)),
+                    err=>console.error(err)
+                )}
+        />
             <Text style={{
                 textAlign: 'center',
                 marginTop: 30,

@@ -3,7 +3,7 @@ use rocket::serde::json::Json;
 use rocket::State;
 use lib_canvas::template::Template;
 
-use crate::constants::{Code, MAX_LIMIT, MAX_POST, error};
+use crate::constants::*;
 use crate::struct_db::{id_template, key_user, key_group, key_template};
 use crate::struct_auth::Auth;
 use crate::struct_user::User;
@@ -18,10 +18,10 @@ pub async fn post<'r>(
 ) -> Json<Response<String>> {
 
     // filters
-    if templates.len() > MAX_POST { return error("max-post"); }
+    if templates.len() > MAX_POST { return error(ERR_MAX_LIMIT); }
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     // info!("!!! template.elements.len()={}", templates[0].elements.len());
 
     let mut group: Group = opt_group.unwrap();
@@ -57,9 +57,9 @@ pub async fn get<'r>(
 
     // fitlers
     let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error("access-denied"); }
+    if !user.id_groups.contains(id_group) { return error(ERR_ACCESS_DENIED); }
     let opt_group: Option<Group> = server.db.read::<Group>(&key_group(id_group));
-    if opt_group.is_none() { return error("group-not-found"); }
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
 
     limit = min(limit, MAX_LIMIT);
     info!("templates get id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit);
@@ -85,10 +85,10 @@ pub async fn delete<'r>(
 
     // fitlers
     let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error("access-denied"); }
+    if !user.id_groups.contains(id_group) { return error(ERR_ACCESS_DENIED); }
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
-    if opt_group.is_none() { return error("group-not-found"); }
+    if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group = opt_group.unwrap();
     if !group.id_templates.contains(id_template) { return error("template-not-found"); }
 

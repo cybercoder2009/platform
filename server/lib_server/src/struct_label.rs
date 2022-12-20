@@ -9,8 +9,3 @@ pub struct Label {
     pub width: u32,
     pub height: u32,
 }
-
-#[derive(Deserialize)]
-pub struct LabelPatch {
-    pub id_item: String,
-}
