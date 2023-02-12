@@ -31,7 +31,7 @@ pub async fn post<'r>(
     let mut data: Vec<String> = vec![];
     for template in templates.iter() {
 
-        let _id_template: String = id_template(template.keyword.trim(), template.width, template.height);
+        let _id_template: String = id_template(&template.keyword, template.width, template.height);
         ks.push(key_template(id_group, &_id_template));
         group.id_templates.insert(_id_template.clone(), _id_template.clone().to_lowercase());
         data.push(_id_template);
@@ -41,7 +41,7 @@ pub async fn post<'r>(
     server.db.write::<Group>(&_key_group, &group);
 
     // update g-$id_group-t-$id_template
-    info!("templates keys={:?}", &ks);
+    info!("!!! templates keys={:?}", &ks);
     server.db.write_batch::<Template>(&ks, &templates);
 
     Json(Response {
@@ -77,6 +77,7 @@ pub async fn get<'r>(
     let keys: Vec<String> = group.id_templates.keys()
         .cloned().collect::<Vec<String>>()[skip .. min(skip + limit, total)]
         .iter().map(|id|{key_template(id_group, id)}).collect();
+    println!("!!!!! keys={:?}", &keys);
     let templates: Vec<Template> = server.db.read_batch::<Template>(&keys);
 
     Json(Response {

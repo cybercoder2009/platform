@@ -182,7 +182,7 @@ mod route_users {
             }),
         ).await.into_inner();
         println!("[route_users.post] {:?}\r\n", res);
-        assert_eq!(Code::Error("access-denied"), res.code);
+        assert_eq!(Code::Error("access-denied".to_string()), res.code);
 
         /* user patch as admin */
         let password0: String = random::string(10);
@@ -206,7 +206,7 @@ mod route_users {
             }),
         ).await.into_inner();
         println!("[route_users.patch(invalid-user)] {:?}\r\n", res);
-        assert_eq!(Code::Error("access-denied"), res.code);
+        assert_eq!(Code::Error("access-denied".to_string()), res.code);
 
         /* user patch as valid user */
         let res = patch_password(
@@ -275,6 +275,6 @@ mod route_users {
             }),
         ).await.into_inner();
         println!("[route_users.post] {:?}\r\n", res);
-        assert_eq!(Code::Error("invalid-user-id"), res.code);
+        assert_eq!(Code::Error("invalid-user-id".to_string()), res.code);
     }
 }

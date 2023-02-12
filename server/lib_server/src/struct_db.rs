@@ -4,7 +4,9 @@ use serde::Serialize;
 use serde::de::DeserializeOwned;
 use rusty_leveldb::{DB as LevelDB, Options, in_memory};
 use lib_utilities::hash::sha3_256;
+use lib_canvas::template::Template;
 
+use crate::struct_response::Response;
 use crate::struct_user::User;
 use crate::struct_group::Group;
 use crate::constants::*;
@@ -31,7 +33,7 @@ pub fn key_label(id_group: &str, id_label: &str)       -> String { format!("g-{}
 // g-$id_group-i-$id_item-labels ------> [$id_label, ...]  
 pub fn key_item_labels(id_group: &str, id_item: &str)  -> String { format!("g-{}-i-{}-labels", id_group, id_item) }
 
-pub fn id_template(keyword: &str, width: u32, height: u32) -> String { format!("{}-{}x{}", keyword, width, height) } 
+pub fn id_template(keyword: &str, width: u32, height: u32) -> String { format!("{}-{}x{}", keyword.trim(), width, height) } 
 
 pub struct DB {
     db: Mutex<LevelDB>,
@@ -206,6 +208,16 @@ impl DB {
             );
 
             // update g-$id_group - user
+            let res: Response<Template> = serde_json::from_str::<Response<Template>>(crate::constants::TEMPLATES).unwrap();
+            let templates: Vec<Template> = res.data.unwrap();
+            let mut id_templates: BTreeMap<String, String> = BTreeMap::new();
+            let mut ks: Vec<String> = vec![];
+            for template in &templates {
+                let _id_template = id_template(&template.keyword, template.width, template.height);
+                id_templates.insert(_id_template.clone(), template.keyword.trim().to_lowercase());
+                ks.push(key_template(ID_GROUP_USER, &_id_template));
+            }
+            println!("!!! templates keys={:?}", &ks);
             let _key_group: String = key_group(ID_GROUP_USER);
             let mut id_associates: BTreeSet<String> = BTreeSet::new();
             id_associates.insert(ID_USER0.to_string());
@@ -215,11 +227,12 @@ impl DB {
                     name: "My First Group".to_string(),
                     // id_bases: BTreeSet::new(),
                     id_associates,
-                    id_templates: BTreeMap::new(),
+                    id_templates,
                     id_items: BTreeMap::new(),
                     id_labels: BTreeMap::new(),
                 }
             );
+            self.write_batch::<Template>(&ks, &templates);
         }
     }
 }

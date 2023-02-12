@@ -92,7 +92,7 @@ mod route_auth {
             }),
         ).await.into_inner();
         println!("[route_auth.post] {:?}\r\n", res);
-        assert_eq!(Code::Error("invalid-email"), res.code);
+        assert_eq!(Code::Error("invalid-email".to_string()), res.code);
 
         /* auth post with unregistered user */
         let res = post_auth(
@@ -103,7 +103,7 @@ mod route_auth {
             }),
         ).await.into_inner();
         println!("[route_auth.post] {:?}\r\n", res);
-        assert_eq!(Code::Error("user-not-found"), res.code);
+        assert_eq!(Code::Error("user-not-found".to_string()), res.code);
 
         /* auth post with wrong password */
         let res = post_auth(
@@ -114,6 +114,6 @@ mod route_auth {
             }),
         ).await.into_inner();
         println!("[route_auth.post] {:?}\r\n", res);
-        assert_eq!(Code::Error("invalid-password"), res.code);
+        assert_eq!(Code::Error("invalid-password".to_string()), res.code);
     }
 }

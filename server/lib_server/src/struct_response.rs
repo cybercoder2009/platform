@@ -1,11 +1,11 @@
-use rocket::serde::Serialize;
+use rocket::serde::{Serialize, Deserialize};
 
 use crate::constants::Code;
 
-#[derive(Serialize, Debug)]
-pub struct Response<'a, T> {
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Response<T> {
 
-    pub code: Code<'a>,
+    pub code: Code,
     
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total: Option<usize>,
