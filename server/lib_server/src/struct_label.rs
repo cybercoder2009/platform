@@ -4,7 +4,7 @@ use rocket::serde::{Deserialize, Serialize};
 pub struct Label {
     pub id: String,
     pub mac: String,
-    pub firmware: String,
+    pub version: String,
     pub id_item: String,
     pub width: u32,
     pub height: u32,

@@ -10,9 +10,7 @@ pub const ID_ADMIN: &str = "admin@reducing.ca";
 pub const ID_USER: &str  = "user@reducing.ca";
 pub const ID_USER0: &str  = "user0@reducing.ca";
 
-pub const PW_ADMIN: &str = "password";
-pub const PW_USER: &str  = "password";
-pub const PW_USER0: &str  = "password";
+pub const PW: &str = "password";
 
 pub const TOKEN_ADMIN: &str = "ogK9PdfcL0PLIrWi";
 pub const TOKEN_USER: &str  = "P0MgnlTGMRGCirMW";

@@ -13,7 +13,7 @@ use crate::struct_server::Server;
 
 #[post("/<id_group>/associates", format = "application/json", data = "<associates>")]
 pub async fn post<'r>(
-    server: &'r State<Server>, _auth: Auth,
+    server: &'r State<Server>, auth: Auth,
     id_group: &'r str, associates: Json<Vec<String>>,
 ) -> Json<Response<String>> {
     
@@ -22,8 +22,11 @@ pub async fn post<'r>(
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
-
     let mut group: Group = opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !(auth.role == Role::Admin || user.id_groups.contains(id_group))
+    { return error(ERR_ACCESS_DENIED); }
+
     let mut data: Vec<String> = vec![];
     for associate in associates.iter() {
         if email(&associate) {
@@ -48,14 +51,15 @@ pub async fn get<'r>(
 ) -> Json<Response<String>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error(ERR_ACCESS_DENIED); }
     let opt_group: Option<Group> = server.db.read::<Group>(&key_group(id_group));
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
+    let group: Group = opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !(auth.role == Role::Admin || user.id_groups.contains(id_group))
+    { return error(ERR_ACCESS_DENIED); }
 
     limit = min(limit, MAX_LIMIT);
     info!("associates get id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit);
-    let group: Group = opt_group.unwrap();
     let total: usize = group.id_associates.len();
     let associates: Vec<String> = group.id_associates
         .into_iter().collect::<Vec<String>>()[skip .. min(skip + limit, total)].to_vec();
@@ -74,13 +78,14 @@ pub async fn delete<'r>(
 ) -> Json<Response<String>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error(ERR_ACCESS_DENIED); }
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group = opt_group.unwrap();
     if !group.id_associates.contains(id_associate) { return error("associate-not-found"); }
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !(auth.role == Role::Admin || user.id_groups.contains(id_group))
+    { return error(ERR_ACCESS_DENIED); }
 
     // update g-$id_group
     group.id_associates.remove(id_associate);

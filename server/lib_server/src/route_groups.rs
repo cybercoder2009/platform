@@ -33,9 +33,9 @@ pub async fn post<'r>(
         &Group {
             id: id_group.clone(),
             name: group.0.name,
-            id_bases: BTreeSet::new(),
-            id_templates: BTreeSet::new(),
+            // id_bases: BTreeSet::new(),
             id_associates: BTreeSet::new(),
+            id_templates: BTreeMap::new(),
             id_items: BTreeMap::new(),
             id_labels: BTreeMap::new(),
         }

@@ -71,7 +71,7 @@ pub fn render_label_image (
         u16(),
         &label.id,
         &label.mac,
-        &label.firmware,
+        &label.version,
         3,
         1,
         content,

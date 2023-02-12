@@ -14,7 +14,7 @@ const SIZES = {
     yl_266_296x152: {width: 296, height: 152},
     yl_290_296x128: {width: 296, height: 128},
     yl_420_400x300: {width: 400, height: 300},
-    yl_750_800x480: {width: 800, height: 480},
+    yl_750_640x384: {width: 640, height: 384},
 }
 const SIZE = 'yl_154_200x200'
 

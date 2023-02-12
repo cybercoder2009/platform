@@ -30,7 +30,8 @@ use std::time::Duration;
 use std::convert::From;
 use std::fs::create_dir_all;
 use std::net::IpAddr;
-use rumqttc::{MqttOptions, AsyncClient, QoS, EventLoop};
+use rumqttc::{MqttOptions, AsyncClient, QoS, EventLoop, Event};
+use rumqttc::v4::Packet;
 use rocket::config::{Config as ConfigRocket, LogLevel};
 use rocket::fs::FileServer;
 use rocket::http::Method;
@@ -74,23 +75,27 @@ async fn main() {
         "TOPIC_NOTIFY":"test/refresh/notify",
         "TOPIC_CONFIG":"test/device/config",
         "TOPIC_DEVICE_PROPERTY":"test/device/property"
-        TODO: migrate to lib_vendors
     */
     let mut mqttoptions = MqttOptions::new("server", &config.mqtt_host, config.mqtt_port);
     mqttoptions.set_keep_alive(Duration::from_secs(10));
     let (mqtt, mut _eventloop): (AsyncClient, EventLoop) = AsyncClient::new(mqttoptions, 10);
-    mqtt.subscribe("test/refresh/queue", QoS::AtMostOnce).await.unwrap();
+    mqtt.subscribe("#", QoS::AtMostOnce).await.unwrap();
     rocket::tokio::spawn(async move {
-        while let Ok(_notification) = _eventloop.poll().await {
+        while let Ok(notification) = _eventloop.poll().await {
             // TODO
-            // match notification {
-            //     Event::Incoming(e) => {
-            //         info!("<= mqtt {:?}", e);
-            //     },
-            //     Event::Outgoing(e) => {
-            //         info!("=> mqtt {:?}", e);
-            //     },
-            // }
+            match notification {
+                Event::Incoming(e) => {
+                    match e {
+                        Packet::Publish(ee) => {
+                            info!("<= mqtt {:?} {:?}", ee.topic, ee.payload);
+                        },
+                        _ => {}
+                    }
+                },
+                Event::Outgoing(_out) => {
+                    // info!("=> mqtt {:?}", e);
+                },
+            }
         }
     });
 

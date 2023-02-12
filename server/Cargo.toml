@@ -7,3 +7,6 @@ members = [
     "lib_fonts_checker",
     "lib_test",
 ]
+default-members = [
+    "lib_server"
+]

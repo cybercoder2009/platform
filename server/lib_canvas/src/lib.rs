@@ -2,7 +2,7 @@
 
 use std::fs;
 use std::io::Write;
-use log::{info, warn};
+use log::warn;
 use core::f32::consts::PI;
 use barcoders::generators::image::{Color as BarcodeColor, Image as BarcodeImage, Rotation};
 use barcoders::sym::ean13::{EAN13, UPCA}; // UPC-A are EAN-13 that start with a 0.
@@ -34,8 +34,8 @@ fn draw_barcode(
     fill: &str,
     fill_light: &str,
 ) {
-    info!("draw_barcode x={} y={} width={} height={} text={} format={} rotation={}",
-        x, y, width, height, text, format, rotation);
+    // info!("draw_barcode x={} y={} width={} height={} text={} format={} rotation={}",
+    //     x, y, width, height, text, format, rotation);
 
     let (rd, gd, bd, ad): (u8, u8, u8, u8) = parse_color(fill);
     let (rl, gl, bl, al): (u8, u8, u8, u8) = parse_color(fill_light);
@@ -102,8 +102,8 @@ fn draw_text(
     fill: &str,
 ) {
     let mut _fontStyle: FontStyle = FontStyle::normal(); if fontStyle == "italic" {_fontStyle = FontStyle::italic();}
-    info!("draw_text x={} y={} fontSize={} fontFamily={} fontStyle={} text={} rotation={} fill={}",
-        x, y, fontSize, fontFamily, fontStyle, text, rotation, fill);
+    // info!("draw_text x={} y={} fontSize={} fontFamily={} fontStyle={} text={} rotation={} fill={}",
+    //     x, y, fontSize, fontFamily, fontStyle, text, rotation, fill);
     
     let mut paint: Paint = Paint::default();
     paint.set_anti_alias(true);
@@ -200,7 +200,7 @@ fn draw_circles(
         }
     }
 
-    info!("draw_circles x={} y={} radius={} strokeWidth={} rotation={} margin={} value={} max={} values={:?}", x, y, radius, strokeWidth, rotation, margin, value, max, values);
+    // info!("draw_circles x={} y={} radius={} strokeWidth={} rotation={} margin={} value={} max={} values={:?}", x, y, radius, strokeWidth, rotation, margin, value, max, values);
 
     canvas.save();
     canvas.translate((x, y)).rotate(rotation, None);
@@ -310,7 +310,7 @@ fn draw_stars(
         }
     }
 
-    info!("draw_stars x={} y={} innerRadius={} outerRadius={} strokeWidth={} rotation={} margin={} value={} max={} values={:?}", x, y, innerRadius, outerRadius, strokeWidth, rotation, margin, value, max, values);
+    // info!("draw_stars x={} y={} innerRadius={} outerRadius={} strokeWidth={} rotation={} margin={} value={} max={} values={:?}", x, y, innerRadius, outerRadius, strokeWidth, rotation, margin, value, max, values);
 
     canvas.save();
     canvas.translate((x, y)).rotate(rotation, None);
@@ -350,7 +350,7 @@ fn draw_image(
     rgba: &[u8],
     dither: bool,
 ) {
-    info!("draw_image x={} y={} natural_width={} natural_height={} width={} height={} rgba.len()={} rotation={}", x, y, natural_width, natural_height, width, height, rgba.len(), rotation);
+    // info!("draw_image x={} y={} natural_width={} natural_height={} width={} height={} rgba.len()={} rotation={}", x, y, natural_width, natural_height, width, height, rgba.len(), rotation);
 
     let info: ImageInfo = ImageInfo::new(
         (natural_width as i32, natural_height as i32),

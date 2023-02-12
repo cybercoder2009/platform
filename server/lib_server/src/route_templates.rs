@@ -13,7 +13,7 @@ use crate::struct_server::Server;
 
 #[post("/<id_group>/templates", format = "application/json", data = "<templates>")]
 pub async fn post<'r>(
-    server: &'r State<Server>, _auth: Auth,
+    server: &'r State<Server>, auth: Auth,
     id_group: &'r str, templates: Json<Vec<Template>>,
 ) -> Json<Response<String>> {
 
@@ -22,16 +22,18 @@ pub async fn post<'r>(
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
-    // info!("!!! template.elements.len()={}", templates[0].elements.len());
-
     let mut group: Group = opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !(auth.role == Role::Admin || user.id_groups.contains(id_group))
+    { return error(ERR_ACCESS_DENIED); }
+
     let mut ks: Vec<String> = vec![];
     let mut data: Vec<String> = vec![];
     for template in templates.iter() {
 
         let _id_template: String = id_template(template.keyword.trim(), template.width, template.height);
         ks.push(key_template(id_group, &_id_template));
-        group.id_templates.insert(_id_template.clone());
+        group.id_templates.insert(_id_template.clone(), _id_template.clone().to_lowercase());
         data.push(_id_template);
     }
 
@@ -56,18 +58,25 @@ pub async fn get<'r>(
 ) -> Json<Response<Template>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error(ERR_ACCESS_DENIED); }
     let opt_group: Option<Group> = server.db.read::<Group>(&key_group(id_group));
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
+    let mut group: Group = opt_group.unwrap();
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !(auth.role == Role::Admin || user.id_groups.contains(id_group))
+    { return error(ERR_ACCESS_DENIED); }
 
     limit = min(limit, MAX_LIMIT);
     info!("templates get id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit);
-    let group: Group = opt_group.unwrap();
+    let keyword_0: String = keyword.trim().to_lowercase();
+    
+    group.id_templates.retain(
+        |_, _keyword|
+        _keyword.contains(&keyword_0)
+    );
     let total: usize = group.id_templates.len();
-    let keys: Vec<String> = group.id_templates
-        .iter().collect::<Vec<&String>>()[skip .. min(skip + limit, total)]
-        .iter().map(|id|{key_template(id_group, *id)}).collect();
+    let keys: Vec<String> = group.id_templates.keys()
+        .cloned().collect::<Vec<String>>()[skip .. min(skip + limit, total)]
+        .iter().map(|id|{key_template(id_group, id)}).collect();
     let templates: Vec<Template> = server.db.read_batch::<Template>(&keys);
 
     Json(Response {
@@ -84,13 +93,14 @@ pub async fn delete<'r>(
 ) -> Json<Response<&'r str>> {
 
     // fitlers
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) { return error(ERR_ACCESS_DENIED); }
     let _key_group: String = key_group(id_group);
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group = opt_group.unwrap();
-    if !group.id_templates.contains(id_template) { return error("template-not-found"); }
+    if !group.id_templates.contains_key(id_template) { return error("template-not-found"); }
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !(auth.role == Role::Admin || user.id_groups.contains(id_group))
+    { return error(ERR_ACCESS_DENIED); }
 
     // update g-$id_group
     group.id_templates.remove(id_template);

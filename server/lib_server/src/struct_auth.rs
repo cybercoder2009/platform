@@ -47,6 +47,6 @@ impl Auth {
 }
 
 impl AuthPost {
-    pub fn _mock_admin() -> AuthPost {AuthPost {id: ID_ADMIN.to_string(), password: PW_ADMIN.to_string()}}
-    pub fn _mock_user() -> AuthPost {AuthPost {id: ID_USER.to_string(), password: PW_USER.to_string()}}
+    pub fn _mock_admin() -> AuthPost {AuthPost {id: ID_ADMIN.to_string(), password: PW.to_string()}}
+    pub fn _mock_user() -> AuthPost {AuthPost {id: ID_USER.to_string(), password: PW.to_string()}}
 }

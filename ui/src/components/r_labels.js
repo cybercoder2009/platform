@@ -18,7 +18,7 @@ const Labels = ({
     const columns = [
         {title: langs['id'][lang], dataIndex: 'id', key: 'id', fixed: 'left'},
         {title: langs['mac'][lang], dataIndex: 'mac', key: 'mac', fixed: 'left'},
-        {title: langs['firmware'][lang], dataIndex: 'firmware', key: 'firmware'},
+        {title: langs['version'][lang], dataIndex: 'version', key: 'version'},
         {title: langs['width'][lang], dataIndex: 'width', key: 'width'},
         {title: langs['height'][lang], dataIndex: 'height', key: 'height'},
         {title: langs['item'][lang], dataIndex: 'id_item', key: 'id_item',
@@ -28,7 +28,6 @@ const Labels = ({
                 set_records(_records)
             }} />
         },
-        {title: langs['group'][lang], dataIndex: 'name_group', key: 'name_group'},
         {title: langs['actions'][lang], key: 'actions', fixed: 'right', width: 150,
             render: r => 
             <Input.Group compact>

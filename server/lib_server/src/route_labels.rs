@@ -4,6 +4,7 @@ use rocket::serde::json::Json;
 use rocket::tokio::spawn;
 use rocket::State;
 use serde_json::Value;
+use rumqttc::AsyncClient;
 use lib_canvas::template::Template;
 use lib_utilities::random::u16;
 use lib_vendors::yala::Message;
@@ -31,18 +32,22 @@ pub async fn post<'r>(
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group= opt_group.unwrap();
     let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
-        return error(ERR_ACCESS_DENIED); }
+    if !(
+        auth.role == Role::Admin ||
+        user.id_groups.contains(id_group) || 
+        group.id_associates.contains(&auth.id)
+    ){ return error(ERR_ACCESS_DENIED); }
         
     let mut data: Vec<String> = vec![];
-    let mut ks: Vec<String> = vec![];
+    let mut keys_labels: Vec<String> = vec![];
+
     for label in labels.iter() {
 
         // filter
         let id_label: String = label.id.clone();
         if id_label.trim().is_empty() { continue; }
 
-        ks.push(key_label(id_group, &id_label));
+        keys_labels.push(key_label(id_group, &id_label));
         group.id_labels.insert(id_label.clone(), id_label.clone().trim().to_lowercase());
         data.push(label.id.clone());
 
@@ -67,7 +72,7 @@ pub async fn post<'r>(
                 u16(),
                 &label.id,
                 &label.mac,
-                &label.firmware,
+                &label.version,
                 2,
                 0,
                 Vec::new(),
@@ -92,17 +97,14 @@ pub async fn post<'r>(
             if opt_template.is_none() { continue; }
             let mut template: Template = opt_template.unwrap();
             
-            let mqtt_0 = server.mqtt.clone();
+            let mqtt_0: AsyncClient = server.mqtt.clone();
             let images_0: String = server.images.clone();
             let label_0: Label = label.clone();
 
             // populate & dispatch
             spawn(async move {
-
                 populate(&item.as_object().unwrap(), &mut template);
-
-                let message = render_label_image(&label_0, &template, &images_0);
-                
+                let message: Message = render_label_image(&label_0, &template, &images_0);
                 mqtt_0.publish(
                     "test/refresh/queue",
                     rumqttc::QoS::AtLeastOnce,
@@ -117,7 +119,7 @@ pub async fn post<'r>(
     server.db.write::<Group>(&_key_group, &group);
 
     // update g-$id_group-l-$id_label
-    server.db.write_batch::<Label>(&ks, &labels);
+    server.db.write_batch::<Label>(&keys_labels, &labels);
 
     Json(Response {
         code: Code::Success(()),
@@ -137,8 +139,11 @@ pub async fn get<'r>(
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group = opt_group.unwrap();
     let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
-        return error(ERR_ACCESS_DENIED); }
+    if !(
+        auth.role == Role::Admin ||
+        user.id_groups.contains(id_group) || 
+        group.id_associates.contains(&auth.id)
+    ){ return error(ERR_ACCESS_DENIED); }
     
     limit = std::cmp::min(limit, MAX_LIMIT);
     info!("labels get _id_group={} keyword={} skip={} limit={}", id_group, keyword, skip, limit); 
@@ -168,10 +173,13 @@ pub async fn delete<'r>(
     let opt_group: Option<Group> = server.db.read::<Group>(&_key_group);
     if opt_group.is_none() { return error(ERR_GROUP_NOT_FOUND); }
     let mut group: Group = opt_group.unwrap();
-    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
-    if !user.id_groups.contains(id_group) && !group.id_associates.contains(&auth.id) { 
-        return error(ERR_ACCESS_DENIED); }
     if !group.id_labels.contains_key(id_label) { return error("label-not-found"); }
+    let user: User = server.db.read::<User>(&key_user(&auth.id)).unwrap();
+    if !(
+        auth.role == Role::Admin ||
+        user.id_groups.contains(id_group) || 
+        group.id_associates.contains(&auth.id)
+    ){ return error(ERR_ACCESS_DENIED); }
 
     // update g-$id_group
     group.id_labels.remove(id_label);
@@ -247,7 +255,7 @@ mod route_labels {
         let label: Label = Label {
             id: id_label.to_string(),
             mac: "mac".to_string(),
-            firmware: "firmware".to_string(),
+            version: "version".to_string(),
             id_item: "id_item".to_string(),
             width: 213,
             height: 102,

@@ -19,8 +19,6 @@
 	"edit": {"en": "Edit", "fr": "Editer"},
 	"email": {"en": "Email", "fr": "E-mail"},
 	"extra": {"en": "Extra", "fr": "En plus"},
-
-	"firmware": {"en": "Firmware", "fr": "Micrologiciel"},
 	
 	"group": {"en": "Group", "fr": "Groupe"},
 	"groups": {"en": "Groups", "fr": "Groupes"},
@@ -71,6 +69,7 @@
 	"update": {"en": "Update", "fr": "Mettre à jour"},
 
 	"vendor": {"en": "Vendor", "fr": "Vendeuse"},
+	"version": {"en": "Version", "fr": "Version"},
 
 	"width": {"en": "Width", "fr": "Largeur"}
 }

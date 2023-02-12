@@ -102,12 +102,15 @@ impl DB {
         k: &str,
     ) -> Option<T> {
     
-        match self.db.lock().unwrap().get(k.as_bytes()) {
-            Some(bytes) => {
-                let json: String = String::from_utf8_lossy(&bytes).into();
-                Some(serde_json::from_str::<T>(&json).unwrap())
-            },
-            None => None
+        match self.db.try_lock() {
+            Ok(mut lock) => match lock.get(k.as_bytes()) {
+                Some(bytes) => {
+                    let json: String = String::from_utf8_lossy(&bytes).into();
+                    Some(serde_json::from_str::<T>(&json).unwrap())
+                },
+                None => None
+            }
+            Err(_) => None,
         }
     }
     
@@ -159,7 +162,7 @@ impl DB {
             id_groups.insert(ID_GROUP_ADMIN.to_string());
             self.write::<User>(&key_user(ID_ADMIN),
                 &User{
-                    password: sha3_256(PW_ADMIN),
+                    password: sha3_256(PW),
                     role: Role::Admin,
                     token: TOKEN_ADMIN.to_string(),
                     id_groups,
@@ -171,7 +174,7 @@ impl DB {
             id_groups.insert(ID_GROUP_USER.to_string());
             self.write::<User>(&key_user(ID_USER),
                 &User{
-                    password: sha3_256(PW_USER),
+                    password: sha3_256(PW),
                     role: Role::User,
                     token: TOKEN_USER.to_string(),
                     id_groups,
@@ -181,7 +184,7 @@ impl DB {
             // update u-$id_user - user0
             self.write::<User>(&key_user(ID_USER0),
                 &User{
-                    password: sha3_256(PW_USER0),
+                    password: sha3_256(PW),
                     role: Role::User,
                     token: TOKEN_USER0.to_string(),
                     id_groups: BTreeSet::new(),
@@ -194,9 +197,9 @@ impl DB {
                 &Group {
                     id: ID_GROUP_ADMIN.to_string(),
                     name: "My First Group".to_string(),
-                    id_bases: BTreeSet::new(),
-                    id_templates: BTreeSet::new(),
+                    // id_bases: BTreeSet::new(),
                     id_associates: BTreeSet::new(),
+                    id_templates: BTreeMap::new(),
                     id_items: BTreeMap::new(),
                     id_labels: BTreeMap::new(),
                 }
@@ -210,9 +213,9 @@ impl DB {
                 &Group {
                     id: ID_GROUP_USER.to_string(),
                     name: "My First Group".to_string(),
-                    id_bases: BTreeSet::new(),
-                    id_templates: BTreeSet::new(),
+                    // id_bases: BTreeSet::new(),
                     id_associates,
+                    id_templates: BTreeMap::new(),
                     id_items: BTreeMap::new(),
                     id_labels: BTreeMap::new(),
                 }

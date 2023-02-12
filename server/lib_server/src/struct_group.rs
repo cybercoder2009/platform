@@ -5,11 +5,11 @@ use rocket::serde::{Deserialize, Serialize};
 pub struct Group {
     pub id: String,
     pub name: String,
-    pub id_bases: BTreeSet<String>,
-    pub id_templates: BTreeSet<String>,
+    // pub id_bases: BTreeSet<String>,
     pub id_associates: BTreeSet<String>,
-    pub id_items: BTreeMap<String, String>,  // $id_item ------> $keyword(lowercase)
-    pub id_labels: BTreeMap<String, String>, // $id_item ------> $keyword(lowercase)
+    pub id_templates: BTreeMap<String, String>, // $id_template ------> $keyword(lowercase)
+    pub id_items: BTreeMap<String, String>,     // $id_item     ------> $keyword(lowercase)
+    pub id_labels: BTreeMap<String, String>,    // $id_label    ------> $keyword(lowercase)
 }
 
 #[derive(Deserialize)]
