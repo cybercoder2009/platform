@@ -12,7 +12,7 @@ export const EditText = (props) => {
             // console.log(`key=${key} fontSize=${_shape.fontSize} fontStyle=${_shape.fontStyle} fontFamily=${_shape.fontFamily}`)
             let ctx = document.createElement("canvas").getContext("2d")
             ctx.font = `${_shape.fontSize}pt ${_shape.fontFamily} ${_shape.fontStyle}`
-            _shape.width = ctx.measureText(_shape.text).width
+            _shape.width = Math.floor(ctx.measureText(_shape.text).width)
             _shape.height = _shape.fontSize
         }
         props.onChange(_shape)
