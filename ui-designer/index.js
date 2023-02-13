@@ -37,6 +37,15 @@ const Designer = (props) => {
 			set_select(null)
        		return
 		}
+		// else if (e.target.constructor.name === 'Text'){
+		// 	console.log(`e.target.getTextWidth()=${e.target.getTextWidth()}`)
+		// 	console.log(`e.target.getTextHeight()=${e.target.getTextHeight()}`)
+		// 	console.log(`e.target.getWidth()=${e.target.getWidth()}`)
+		// 	console.log(`e.target.getHeight()=${e.target.getHeight()}`)
+		// 	console.log(`e.target.width()=${e.target.width()}`)
+		// 	console.log(`e.target.height()=${e.target.height()}`)
+		// 	console.log(`e.target.getClientRect()=${JSON.stringify(e.target.getClientRect())}`)
+		// }
 	}
 
 	const on_template_keyword_change = e => {

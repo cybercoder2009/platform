@@ -7,10 +7,14 @@ export const EditText = (props) => {
 
     const onChange = (key, value) => {
         const _shape = {...props.shape}
-        if(key === "fontSize"){
-            _shape["fontSizeTemp"] = value
-        }
         _shape[key] = value
+        if (['text', 'fontSize', 'fontStyle', 'fontFamily'].indexOf(key) >= 0) {
+            // console.log(`key=${key} fontSize=${_shape.fontSize} fontStyle=${_shape.fontStyle} fontFamily=${_shape.fontFamily}`)
+            let ctx = document.createElement("canvas").getContext("2d")
+            ctx.font = `${_shape.fontSize}pt ${_shape.fontFamily} ${_shape.fontStyle}`
+            _shape.width = ctx.measureText(_shape.text).width
+            _shape.height = _shape.fontSize
+        }
         props.onChange(_shape)
     }
 
@@ -35,11 +39,11 @@ export const EditText = (props) => {
             </div>
             <div>
                 <span>width</span>
-                <input type="number" value={props.shape.width} onChange={e=>onChange('width', parseInt(e.target.value))} />
+                <input type="number" value={props.shape.width} disabled />
             </div>
             <div>
                 <span>height</span>
-                <input type="number" value={props.shape.height} onChange={e=>onChange('height', parseInt(e.target.value))} />
+                <input type="number" value={props.shape.height} disabled />
             </div>
             <div>
                 <span>fill</span>

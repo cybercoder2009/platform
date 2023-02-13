@@ -46,7 +46,15 @@ export const ElementText = ({props, isSelected, onSelect, onChange}) => {
                     })
                 }}
             />
-            {isSelected && <Transformer {...TRANSFORMER_PROPS} ref={ref_tf} />}
+            {
+                isSelected && <Transformer {...TRANSFORMER_PROPS} ref={ref_tf}
+                    boundBoxFunc={(oldBox, newBox) => {
+                        console.log(`oldBox = ${JSON.stringify(oldBox)}`)
+                        console.log(`newBox = ${JSON.stringify(newBox)}`)
+                        return newBox
+                    }}
+                />
+            }
         </>
     )
 }
